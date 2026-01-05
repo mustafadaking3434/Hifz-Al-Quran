@@ -2,1238 +2,866 @@
 <html lang="en" >
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>حفظ القرآن - Hifz Al-Quran</title>
-
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Cairo&family=Scheherazade+New&display=swap" rel="stylesheet" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo&family=Scheherazade+New&display=swap');
+    
     :root {
       --primary-green: #1b5e20;
-      --gold: #d4af37;
-      --bg-light: #f9f9f7;
-      --bg-dark: #121a12;
-      --text-dark: #0d1b0f;
-      --text-light: #e0e0d8;
+      --accent-gold: #d4af37;
+      --background-light: #f9f9f7;
+      --background-dark: #0d1b0f;
+      --text-dark: #263238;
+      --text-light: #f0f0e9;
       --tajweed-madd: #f39c12;
       --tajweed-ghunnah: #8e44ad;
       --tajweed-idgham: #27ae60;
-      --tajweed-qalqalah: #e67e22;
-      --highlight-bg: #fff6d1;
-      --highlight-bg-dark: #3a552f;
-      --shadow: rgba(0,0,0,0.15);
+      --border-radius: 12px;
+      --shadow: rgba(27, 94, 32, 0.25);
+      --transition-speed: 0.3s;
     }
+    
     /* Reset & base */
-    *, *::before, *::after {
+    * {
       box-sizing: border-box;
     }
     body {
-      font-family: 'Cairo', Arial, sans-serif;
-      margin: 0; padding: 0;
-      background: var(--bg-light);
+      margin: 0;
+      font-family: 'Cairo', sans-serif;
+      background: var(--background-light);
       color: var(--text-dark);
       min-height: 100vh;
-      display: flex; flex-direction: column; align-items: center;
-      transition: background-color 0.4s ease, color 0.4s ease;
-      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+      background-image:
+        radial-gradient(circle at top left, rgba(212,175,55,0.1) 1px, transparent 2px),
+        radial-gradient(circle at bottom right, rgba(27,94,32,0.1) 1px, transparent 2px);
+      background-size: 30px 30px;
+      background-repeat: repeat;
     }
-    h1,h2,h3 {
-      font-family: 'Scheherazade New', serif;
-      margin: 0 0 12px 0;
-    }
+    
     button {
-      background: var(--primary-green);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 18px;
-      margin: 8px 4px;
       cursor: pointer;
-      font-weight: bold;
-      font-size: 1rem;
-      transition: background-color 0.3s ease, box-shadow 0.3s ease;
-      box-shadow: 0 4px 6px var(--shadow);
-      position: relative;
+      border: none;
+      border-radius: var(--border-radius);
+      padding: 12px 22px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-light);
+      background: var(--primary-green);
+      box-shadow: 0 4px 12px var(--shadow);
+      transition: background var(--transition-speed), transform var(--transition-speed);
+      user-select: none;
+      margin: 6px 8px 10px 0;
+      min-width: 140px;
+      text-align: center;
     }
     button:hover, button:focus {
-      background: var(--gold);
+      background: var(--accent-gold);
       color: var(--text-dark);
+      transform: translateY(-2px);
       outline: none;
-      box-shadow: 0 6px 10px var(--shadow);
+      box-shadow: 0 6px 18px rgba(212,175,55,0.5);
     }
-    button[disabled] {
-      background: #a0a0a0;
-      cursor: not-allowed;
-      box-shadow: none;
-      color: #eee;
+    button.secondary {
+      background: #556b2f;
+      color: var(--text-light);
+      box-shadow: 0 4px 10px rgba(27, 94, 32, 0.15);
     }
-    .screen {
-      max-width: 900px;
-      width: 100%;
-      padding: 20px 25px;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      min-height: 80vh;
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px var(--shadow);
-      margin: 20px 0;
-      transition: background-color 0.4s ease, color 0.4s ease;
+    button.secondary:hover, button.secondary:focus {
+      background: #a99a32;
+      color: var(--text-dark);
+      box-shadow: 0 5px 14px rgba(212,175,55,0.4);
     }
-    .active {
-      display: flex;
+    
+    h1, h2 {
+      font-family: 'Scheherazade New', serif;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      color: var(--primary-green);
+      user-select: none;
     }
-    /* Start Screen */
-    #startScreen {
-      background: radial-gradient(circle at center, var(--primary-green), #0a3f2e);
-      color: var(--gold);
-      min-height: 100vh;
-      justify-content: center;
-      text-align: center;
-      padding: 40px 20px;
-      box-shadow: none;
-      border-radius: 0;
-      max-width: none;
-    }
-    #startScreen h1 {
+    h1 {
       font-size: 3rem;
-      margin-bottom: 15px;
-      text-shadow: 0 0 12px var(--gold);
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
     }
-    #startScreen .ayah {
-      font-size: 1.4rem;
-      font-style: italic;
-      max-width: 600px;
-      margin: 10px auto 40px;
-      line-height: 1.4;
-      letter-spacing: 0.02em;
-      text-shadow: 0 0 5px var(--gold);
+    h2 {
+      font-size: 2rem;
+      margin-top: 0;
     }
-    /* Tooltip helper */
-    .tooltip {
-      position: relative;
-      display: inline-block;
-      cursor: help;
-      color: var(--gold);
-    }
-    .tooltip:hover .tooltiptext {
-      visibility: visible;
-      opacity: 1;
-    }
-    .tooltiptext {
-      visibility: hidden;
-      width: 180px;
-      background-color: var(--primary-green);
-      color: var(--gold);
-      text-align: center;
-      border-radius: 6px;
-      padding: 8px;
-      position: absolute;
-      z-index: 1;
-      bottom: 125%;
-      left: 50%;
-      margin-left: -90px;
-      opacity: 0;
-      transition: opacity 0.3s;
-      font-size: 0.85rem;
-      line-height: 1.3;
-      box-shadow: 0 0 8px var(--shadow);
-    }
-    /* Menu */
-    #menuScreen {
-      background: white;
-      color: var(--text-dark);
-      flex-direction: column;
-      align-items: stretch;
-      padding: 20px 30px;
-    }
-    #menuScreen h2 {
-      margin-bottom: 20px;
-      text-align: center;
-      color: var(--primary-green);
-      text-shadow: 0 0 3px #46793e;
-      font-size: 2.25rem;
-      user-select: none;
-    }
-    #menuScreen #languageSelect {
-      margin-bottom: 15px;
-      font-weight: bold;
-      font-size: 1.1rem;
-      padding: 8px 10px;
-      border-radius: 10px;
-      border: 2px solid var(--primary-green);
-      width: 160px;
-      cursor: pointer;
-      background: white;
-      color: var(--text-dark);
-      box-shadow: 0 2px 6px var(--shadow);
-      transition: background-color 0.3s ease;
-      align-self: center;
-    }
-    #menuScreen #languageSelect:hover, #menuScreen #languageSelect:focus {
-      background: var(--gold);
-      color: var(--text-dark);
-      outline: none;
-    }
-    #menuScreen #controls {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-    #menuScreen #reciterSelect {
-      width: 180px;
-      border-radius: 10px;
-      border: 2px solid var(--primary-green);
-      padding: 8px 10px;
-      font-size: 1rem;
-      cursor: pointer;
-      box-shadow: 0 2px 6px var(--shadow);
-      transition: background-color 0.3s ease;
-    }
-    #menuScreen #reciterSelect:hover, #menuScreen #reciterSelect:focus {
-      background: var(--gold);
-      color: var(--text-dark);
-      outline: none;
-    }
-    #surahList {
-      max-height: 480px;
-      overflow-y: auto;
-      border: 2px solid var(--primary-green);
-      border-radius: 16px;
-      padding: 15px;
-      background: #f0f7f0;
-      box-shadow: inset 0 0 15px #d4e8d4;
-      user-select: none;
-      font-weight: 600;
-      font-size: 1.15rem;
-    }
-    .surahItem {
-      border: 2px solid var(--primary-green);
-      border-radius: 14px;
-      padding: 14px 18px;
-      margin: 8px 0;
-      cursor: pointer;
-      transition: background-color 0.3s ease, color 0.3s ease;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: white;
-      box-shadow: 0 2px 6px var(--shadow);
-    }
-    .surahItem:hover, .surahItem:focus {
-      background: var(--gold);
-      color: var(--text-dark);
-      outline: none;
-      box-shadow: 0 5px 15px var(--shadow);
-    }
-    .surahName {
-      font-weight: 700;
-      font-family: 'Scheherazade New', serif;
-      font-size: 1.3rem;
-    }
-    .surahInfo {
-      font-weight: 400;
-      font-size: 1rem;
-      color: var(--primary-green);
-      font-style: italic;
-      user-select: none;
-    }
-    /* Bookmarks */
-    #bookmarksContainer {
-      margin-top: 30px;
-      max-width: 900px;
-      width: 100%;
-    }
-    #bookmarksContainer h3 {
-      margin-bottom: 12px;
-      color: var(--primary-green);
-      font-weight: 700;
-      text-shadow: 0 0 3px #46793e;
-    }
-    #bookmarksList {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .bookmark-item {
-      border: 2px solid var(--primary-green);
-      padding: 10px 18px;
-      border-radius: 12px;
-      background: #e6f0e6;
-      font-weight: 700;
-      color: var(--primary-green);
-      cursor: pointer;
-      box-shadow: 0 3px 6px var(--shadow);
-      transition: background-color 0.3s ease;
-      position: relative;
-      user-select: none;
-      flex: 1 0 140px;
-      max-width: 160px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .bookmark-item:hover {
-      background: var(--gold);
-      color: var(--text-dark);
-      box-shadow: 0 6px 14px var(--shadow);
-    }
-    .bookmark-item button {
-      background: #b22222;
-      font-size: 0.9rem;
-      padding: 4px 8px;
-      border-radius: 8px;
-      cursor: pointer;
-      color: white;
-      border: none;
-      margin-left: 8px;
-      flex-shrink: 0;
-      transition: background-color 0.3s ease;
-    }
-    .bookmark-item button:hover {
-      background: #7a0a0a;
-    }
-    /* Surah View */
-    #surahViewScreen {
-      flex-direction: column;
-      background: white;
-      width: 100%;
-      max-width: 900px;
-      padding: 30px 40px;
-      border-radius: 20px;
-      box-shadow: 0 15px 40px var(--shadow);
-      user-select: none;
-    }
-    #surahViewScreen #surahTitle {
-      font-size: 2.5rem;
-      margin-bottom: 24px;
-      color: var(--primary-green);
-      text-align: center;
-      text-shadow: 0 0 8px #4b794b;
-      font-family: 'Scheherazade New', serif;
-    }
-    #controls {
-      display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
-      margin: 0 0 30px 0;
-      justify-content: center;
-      align-items: center;
-      user-select: none;
-    }
+    
     select, input[type=number] {
-      padding: 8px 14px;
+      font-family: 'Cairo', sans-serif;
       font-size: 1rem;
-      border-radius: 8px;
-      border: 2px solid var(--primary-green);
-      min-width: 110px;
-      box-shadow: 0 3px 6px var(--shadow);
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    select:hover, select:focus,
-    input[type=number]:hover, input[type=number]:focus {
-      background: var(--gold);
+      border-radius: var(--border-radius);
+      border: 1.5px solid var(--primary-green);
+      padding: 8px 12px;
+      margin: 0 10px 12px 0;
+      transition: border-color 0.3s;
+      min-width: 80px;
       color: var(--text-dark);
+    }
+    select:focus, input[type=number]:focus {
+      border-color: var(--accent-gold);
       outline: none;
     }
-    #verses {
-      max-height: 580px;
-      overflow-y: auto;
-      padding: 0 15px;
+    
+    label {
+      font-weight: 600;
+      color: var(--primary-green);
+      user-select: none;
+    }
+    
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 720px;
+      background: white;
+      box-shadow: 0 4px 25px var(--shadow);
+      border-radius: var(--border-radius);
+      padding: 1.5rem 2rem 2rem 2rem;
+      margin-bottom: 2rem;
+    }
+    .screen.active {
+      display: block;
+    }
+    
+    /* Start Screen */
+    #start {
+      text-align: center;
+      background: linear-gradient(135deg, #eafaf1, #d4e9d3);
+      border: 2px solid var(--primary-green);
+      user-select: none;
+    }
+    #start h1 {
+      color: var(--primary-green);
+    }
+    #start .ayah {
+      font-family: 'Scheherazade New', serif;
+      font-size: 1.6rem;
+      font-style: italic;
+      margin-top: 1.2rem;
+      color: #336633;
       user-select: text;
-      scrollbar-width: thin;
-      scrollbar-color: var(--primary-green) transparent;
-      box-shadow: inset 0 0 18px #c6e7c5;
-      border-radius: 20px;
     }
-    #verses::-webkit-scrollbar {
-      width: 9px;
+    
+    /* Menu */
+    #menuTitle {
+      text-align: center;
+      margin-bottom: 1rem;
+      color: var(--primary-green);
     }
-    #verses::-webkit-scrollbar-thumb {
+    #surahList, #hifzSurahList {
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1.5px solid var(--primary-green);
+      border-radius: var(--border-radius);
+      background: #f4f9f4;
+      padding: 0.5rem 0;
+      user-select: none;
+    }
+    .surahItem, .hifzSurahItem {
+      padding: 12px 18px;
+      margin: 6px 12px;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--primary-green);
+      transition: background-color 0.3s, color 0.3s;
+      user-select: none;
+      text-align: left;
+    }
+    .surahItem:hover, .hifzSurahItem:hover,
+    .hifzSurahItem.selected {
       background-color: var(--primary-green);
-      border-radius: 10px;
+      color: var(--text-light);
+      box-shadow: 0 4px 14px var(--shadow);
+    }
+    
+    /* Verses */
+    #verses {
+      margin-top: 1.2rem;
+      user-select: text;
     }
     .verse {
-      border-bottom: 1px solid #d6e4d6;
-      padding: 12px 8px;
-      margin-bottom: 12px;
-      border-radius: 12px;
-      transition: background-color 0.35s ease;
-      cursor: default;
+      position: relative;
+      padding-left: 38px;
+      margin-bottom: 1.8rem;
+      border-bottom: 1px dotted var(--primary-green);
+      padding-bottom: 0.6rem;
+      font-size: 1.3rem;
     }
-    .verse.highlighted {
-      background-color: var(--highlight-bg);
-      box-shadow: 0 0 12px var(--primary-green);
-    }
-    body.night .verse.highlighted {
-      background-color: var(--highlight-bg-dark);
-      box-shadow: 0 0 18px var(--gold);
-      color: var(--text-light);
+    .verse:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
     }
     .verse-number {
+      position: absolute;
+      left: 10px;
+      top: 0;
       font-weight: 700;
-      color: var(--gold);
-      margin-right: 10px;
+      font-size: 1rem;
+      color: var(--accent-gold);
       user-select: none;
-      font-size: 1.3rem;
-      vertical-align: middle;
-      display: inline-block;
-      width: 35px;
-      text-align: center;
+      font-family: 'Scheherazade New', serif;
     }
     .arabic {
       font-family: 'Scheherazade New', serif;
-      font-size: 28px;
+      font-size: 2.4rem;
       direction: rtl;
       text-align: right;
-      margin: 6px 0 0 0;
-      line-height: 1.3;
+      color: var(--primary-green);
+      line-height: 1.4;
       user-select: text;
     }
     .translation {
-      font-size: 17px;
-      color: #555;
-      margin-top: 5px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 1.05rem;
+      color: #3c4d2e;
+      margin-top: 0.25rem;
       user-select: text;
-      font-weight: 400;
+      line-height: 1.5;
     }
+    
+    /* Tajweed coloring (subtle) */
+    .arabic span.madd {
+      color: var(--tajweed-madd);
+      font-weight: 900;
+    }
+    .arabic span.ghunnah {
+      color: var(--tajweed-ghunnah);
+      font-weight: 900;
+    }
+    .arabic span.idgham {
+      color: var(--tajweed-idgham);
+      font-weight: 900;
+    }
+    
+    /* Bismillah styling */
     .bismillah {
-      font-size: 32px;
-      color: var(--gold);
-      font-family: 'Scheherazade New', serif;
+      font-size: 2.6rem;
+      font-weight: 700;
       text-align: center;
-      margin: 18px 0 30px;
-      user-select: none;
-      text-shadow: 0 0 8px #d4af37;
-    }
-    /* Tajweed colors */
-    .madd { color: var(--tajweed-madd); font-weight: bold; }
-    .ghunnah { color: var(--tajweed-ghunnah); font-weight: bold; }
-    .idgham { color: var(--tajweed-idgham); font-weight: bold; }
-    .qalqalah { color: var(--tajweed-qalqalah); font-weight: bold; }
-    /* Hifz Test Screen */
-    #hifzTestScreen {
-      background: white;
-      max-width: 900px;
-      padding: 30px 40px;
-      flex-direction: column;
-      align-items: stretch;
-      border-radius: 20px;
-      box-shadow: 0 15px 40px var(--shadow);
-      user-select: none;
-    }
-    #hifzTestScreen h2 {
-      text-align: center;
-      color: var(--primary-green);
-      margin-bottom: 25px;
+      padding: 1rem 0 2rem 0;
+      color: var(--accent-gold);
       font-family: 'Scheherazade New', serif;
-      font-weight: 700;
-      font-size: 2.1rem;
-      text-shadow: 0 0 6px #4b794b;
-    }
-    #hifzSurahList {
-      max-height: 280px;
-      overflow-y: auto;
-      border: 2px solid var(--primary-green);
-      border-radius: 16px;
-      padding: 15px;
-      background: #f0f7f0;
-      box-shadow: inset 0 0 15px #d4e8d4;
-      font-weight: 600;
-      font-size: 1.1rem;
-      user-select: none;
-    }
-    .hifzSurahItem {
-      padding: 10px 14px;
-      cursor: pointer;
-      user-select: none;
-      border-radius: 8px;
-      margin-bottom: 8px;
-      transition: background-color 0.3s ease;
-    }
-    .hifzSurahItem:hover, .hifzSurahItem.selected {
-      background: var(--gold);
-      color: var(--text-dark);
-      font-weight: 700;
-    }
-    #hifzTestScreen label {
-      font-weight: 700;
-      font-size: 1.1rem;
-      margin-right: 8px;
-      user-select: none;
-    }
-    #hifzTestScreen input[type=number] {
-      width: 90px;
-      padding: 6px 10px;
-      border-radius: 8px;
-      border: 2px solid var(--primary-green);
-      box-shadow: 0 2px 5px var(--shadow);
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    #hifzTestScreen input[type=number]:hover, #hifzTestScreen input[type=number]:focus {
-      background: var(--gold);
-      color: var(--text-dark);
-      outline: none;
-    }
-    #loadSurahBtn, #startRecitationBtn, #stopRecitationBtn {
-      padding: 12px 22px;
-      font-weight: 700;
-      font-size: 1rem;
-      margin-left: 10px;
-      user-select: none;
-    }
-    #startRecitationBtn, #stopRecitationBtn {
-      margin-top: 12px;
-      align-self: flex-start;
-    }
-    #stopRecitationBtn {
-      display: none;
-      background: #b22222;
-      box-shadow: 0 4px 8px rgba(178,34,34,0.7);
-    }
-    #stopRecitationBtn:hover {
-      background: #7a0a0a;
-    }
-    #testVersesContainer {
-      max-height: 300px;
-      overflow-y: auto;
-      margin-top: 20px;
-      padding: 10px 15px;
-      border: 2px solid var(--primary-green);
-      border-radius: 16px;
-      background: #e7f0e7;
-      box-shadow: inset 0 0 15px #bad2b0;
       user-select: text;
-      font-size: 1.3rem;
+      text-shadow: 1px 1px 5px rgba(212,175,55,0.6);
     }
-    #testVersesContainer .verse-number {
-      color: var(--primary-green);
-      font-weight: 700;
-      margin-right: 6px;
+    
+    /* Hifz Test */
+    #hifzTest {
+      user-select: none;
+      color: var(--text-dark);
+    }
+    #hifzTest label {
       user-select: none;
     }
-    #hifzFeedback {
-      margin-top: 20px;
-      font-weight: 700;
-      font-size: 1.3rem;
-      user-select: none;
-      min-height: 40px;
+    #hifzControls {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
     }
     #recordingStatus {
-      margin-top: 8px;
-      font-style: italic;
+      margin-top: 0.75rem;
+      font-weight: 700;
+      font-size: 1.1rem;
       color: var(--primary-green);
+      min-height: 24px;
+      text-align: center;
+    }
+    #hifzFeedback {
+      margin-top: 1rem;
       font-weight: 600;
-      user-select: none;
+      font-size: 1.2rem;
+      min-height: 40px;
+      white-space: pre-wrap;
+      color: #b22;
+      user-select: text;
+      text-align: center;
     }
-    /* Night mode */
-    body.night {
-      background: var(--bg-dark);
-      color: var(--text-light);
-    }
-    body.night button {
-      background: var(--gold);
-      color: var(--text-dark);
-      box-shadow: 0 6px 12px rgba(212,175,55,0.7);
-    }
-    body.night button:hover, body.night button:focus {
-      background: var(--primary-green);
-      color: var(--gold);
-      box-shadow: 0 8px 18px rgba(27,94,32,0.8);
-    }
-    body.night #menuScreen {
-      background: var(--bg-dark);
-      color: var(--text-light);
-    }
-    body.night #surahViewScreen, body.night #hifzTestScreen {
-      background: #203220;
-      color: var(--text-light);
-      box-shadow: 0 15px 40px rgba(212,175,55,0.5);
-    }
-    /* Scroll smooth */
-    html {
-      scroll-behavior: smooth;
+    
+    /* Inputs and selects inline on mobile */
+    @media (max-width: 480px) {
+      #hifzControls {
+        flex-direction: column;
+      }
+      select, input[type=number] {
+        min-width: 100%;
+      }
+      button {
+        min-width: 100%;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Start Screen -->
-  <section id="startScreen" class="screen active" role="main" aria-label="Start Screen">
-    <h1>حفظ القرآن الكريم<br/>Hifz Al-Quran</h1>
-    <p class="ayah" lang="ar">وَقُل رَّبِّ زِدْنِي عِلْمًا</p>
-    <button id="startJourneyBtn" aria-label="Start your Quran journey">Start Your Journey</button>
-    <button id="openHifzTestBtn" aria-label="Open Hifz Recitation Test">Hifz Recitation Test</button>
-  </section>
+<!-- START SCREEN -->
+<div id="start" class="screen active" role="main" aria-label="Start Screen">
+  <h1>حفظ القرآن</h1>
+  <h2>Hifz Al-Quran</h2>
+  <div class="ayah" lang="ar">“وَلَقَدْ يَسَّرْنَا الْقُرْآنَ لِلذِّكْرِ” — ٥٤:١٧</div>
+  <button class="gold" id="startJourneyBtn" aria-label="Begin the journey button">Begin the Journey</button>
+  <button class="gold" id="openHifzTestBtn" aria-label="Open hifz test button" style="margin-left:10px;">Hifz Test</button>
+  <br />
+  <button class="secondary" id="toggleDarkBtn" aria-label="Toggle dark mode">🌙 Toggle Dark Mode</button>
+  <br /><br />
+  <label for="languageSelect" style="font-weight:bold; font-size:16px;">Language / اللغة:</label>
+  <select id="languageSelect" aria-label="Select Language">
+    <option value="en">English</option>
+    <option value="ar">العربية</option>
+  </select>
+</div>
 
-  <!-- Menu Screen -->
-  <section id="menuScreen" class="screen" aria-label="Main Menu">
-    <h2 id="menuTitle">Quran Explorer</h2>
+<!-- MENU -->
+<div id="menu" class="screen" role="main" aria-label="Surah selection menu">
+  <h2 id="menuTitle">Select Surah</h2>
+  <button class="secondary" id="menuToggleDark" aria-label="Toggle dark mode">🌙 Night Mode</button>
+  <br /><br />
+  <div id="surahList" role="list" tabindex="0" aria-label="List of Surahs"></div>
+  <br />
+  <button id="menuBackBtn" class="secondary" aria-label="Back to start">← Back to Start</button>
+</div>
 
-    <select id="languageSelect" aria-label="Select Language">
-      <option value="en">English</option>
-      <option value="ar">العربية</option>
-    </select>
+<!-- SURAH VIEW -->
+<div id="surahView" class="screen" role="main" aria-label="Surah viewing screen">
+  <button class="secondary" id="surahBackBtn" aria-label="Back to surah list">← Back</button>
+  <h2 id="surahTitle"></h2>
 
-    <div id="controls">
-      <select id="reciterSelect" aria-label="Select Reciter">
-        <option value="ar.alafasy">Mishary Alafasy</option>
-        <option value="ar.abdulbasitmurattal">Abdul Basit Murattal</option>
-        <option value="ar.husary">Husary</option>
-        <option value="ar.minshawi">Minshawi</option>
-        <option value="ar.shaatree">Shaatree</option>
-        <option value="ar.sudais">Sudais</option>
-        <option value="ar.ajamy">Ajamy</option>
-      </select>
+  <button id="toggleTajweedBtn" aria-label="Toggle Tajweed coloring">Enable Tajweed</button>
+  <button id="playSurahBtn" aria-label="Play Surah audio">▶ Play Surah</button>
+  <select id="reciterSelect" aria-label="Select Reciter" style="margin-left:10px;">
+    <option value="ar.alafasy">Mishary Alafasy</option>
+    <option value="ar.abdulbasitmurattal">Abdul Basit</option>
+    <option value="ar.husary">Al-Husary</option>
+    <option value="ar.minshawi">Minshawi</option>
+    <option value="ar.shaatree">Shaatree</option>
+    <option value="ar.sudanese">Sudanese</option>
+    <option value="ar.muhammadayyoub">Muhammad Ayyoub</option>
+  </select>
 
-      <button id="toggleTajweedBtn" title="Toggle Tajweed Coloring" aria-pressed="false">Toggle Tajweed</button>
-      <button id="toggleDarkBtn" title="Toggle Night Mode" aria-pressed="false">Night Mode</button>
-      <label for="audioSpeed" title="Change Audio Playback Speed" class="tooltip">Speed
-        <span class="tooltiptext">Adjust the recitation speed</span>
-      </label>
-      <input id="audioSpeed" type="range" min="0.5" max="2" step="0.1" value="1" aria-valuemin="0.5" aria-valuemax="2" aria-valuenow="1" aria-label="Audio Speed Slider" />
-    </div>
+  <div id="verses"></div>
+</div>
 
-    <div id="surahList" role="list" aria-label="List of Surahs">
-      <!-- Surahs will be loaded here -->
-    </div>
+<!-- HIFZ TEST -->
+<div id="hifzTest" class="screen" role="main" aria-label="Hifz test screen" aria-live="polite">
+  <h2 id="hifzTitle">Hifz Test</h2>
+  <div id="hifzSurahList" role="listbox" tabindex="0" aria-label="Select Surah for Hifz Test"></div>
+  <div style="margin-top:10px; text-align: center;">
+    <label for="fromAyahInput" id="fromAyahLabel">From Ayah:</label>
+    <input type="number" id="fromAyahInput" min="1" value="1" aria-describedby="fromAyahLabel" />
+    <label for="toAyahInput" id="toAyahLabel" style="margin-left:15px;">To Ayah:</label>
+    <input type="number" id="toAyahInput" min="1" value="1" aria-describedby="toAyahLabel" />
+  </div>
 
-    <div id="bookmarksContainer">
-      <h3>Bookmarks</h3>
-      <div id="bookmarksList" role="list" aria-label="Bookmarked Surahs">
-        <!-- Bookmarks -->
-      </div>
-    </div>
+  <div id="hifzControls" style="margin-top:15px; justify-content:center;">
+    <button id="loadSurahBtn">Load Surah</button>
+    <button id="startRecitationBtn" disabled>Start Recording</button>
+    <button id="stopRecitationBtn" style="display:none;">Stop Recording</button>
+  </div>
 
-  </section>
+  <div id="recordingStatus"></div>
+  <div id="hifzFeedback"></div>
+  <button id="hifzBackBtn" class="secondary" style="margin-top:20px;">← Back to Start</button>
+</div>
 
-  <!-- Surah View Screen -->
-  <section id="surahViewScreen" class="screen" aria-label="Surah Viewer">
-    <h2 id="surahTitle" tabindex="0">Surah Title</h2>
+<script>
+  // --- Global variables and constants ---
+  let tajweedEnabled = false;
+  let currentSurahId = null;
+  let currentSurahName = '';
+  let currentSurahArabicName = '';
+  let versesData = [];
+  let reciter = 'ar.alafasy';
+  let audioPlayer = null;
+  let isDarkMode = false;
 
-    <div id="controls">
-      <button id="playSurahBtn" aria-label="Play Surah Audio">▶ Play</button>
-      <button id="bookmarkBtn" aria-label="Bookmark this Surah">Bookmark</button>
-      <button id="surahBackBtn" aria-label="Back to Menu">Back</button>
-    </div>
-
-    <div id="verses" tabindex="0" aria-live="polite" aria-atomic="true">
-      <!-- Verses will appear here -->
-    </div>
-  </section>
-
-  <!-- Hifz Test Screen -->
-  <section id="hifzTestScreen" class="screen" aria-label="Hifz Recitation Test">
-    <h2>Hifz Recitation Test</h2>
-
-    <div>
-      <label for="hifzSurahList" class="tooltip">Select Surah
-        <span class="tooltiptext">Choose a surah to test your recitation</span>
-      </label>
-      <div id="hifzSurahList" tabindex="0" role="listbox" aria-label="Surah List for Hifz Test" aria-multiselectable="false" style="outline:none;"></div>
-    </div>
-
-    <div style="margin-top:20px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-      <label for="fromAyahInput">From Ayah</label>
-      <input id="fromAyahInput" type="number" min="1" value="1" aria-label="From Ayah number" />
-      <label for="toAyahInput">To Ayah</label>
-      <input id="toAyahInput" type="number" min="1" value="1" aria-label="To Ayah number" />
-      <button id="loadSurahBtn" aria-label="Load Surah Verses for Hifz Test">Load Verses</button>
-    </div>
-
-    <div id="testVersesContainer" aria-live="polite" aria-atomic="true" tabindex="0" style="margin-top:20px; max-height: 320px; overflow-y: auto; border-radius: 16px;"></div>
-
-    <button id="startRecitationBtn" disabled aria-label="Start recording your recitation">Start Recording</button>
-    <button id="stopRecitationBtn" aria-label="Stop recording your recitation">Stop Recording</button>
-
-    <div id="recordingStatus" aria-live="polite"></div>
-    <div id="hifzFeedback" aria-live="polite"></div>
-    <button id="hifzBackBtn" aria-label="Back to Start Screen" style="margin-top: 24px; align-self:center;">Back</button>
-  </section>
-
-  <script>
-    // Elements
-    const startScreen = document.getElementById('startScreen');
-    const menuScreen = document.getElementById('menuScreen');
-    const surahViewScreen = document.getElementById('surahViewScreen');
-    const hifzTestScreen = document.getElementById('hifzTestScreen');
-
-    const startJourneyBtn = document.getElementById('startJourneyBtn');
-    const openHifzTestBtn = document.getElementById('openHifzTestBtn');
-
-    const menuTitle = document.getElementById('menuTitle');
-    const languageSelect = document.getElementById('languageSelect');
-
-    const surahList = document.getElementById('surahList');
-    const bookmarksList = document.getElementById('bookmarksList');
-
-    const surahTitle = document.getElementById('surahTitle');
-    const versesDiv = document.getElementById('verses');
-
-    const playSurahBtn = document.getElementById('playSurahBtn');
-    const bookmarkBtn = document.getElementById('bookmarkBtn');
-    const surahBackBtn = document.getElementById('surahBackBtn');
-
-    const reciterSelect = document.getElementById('reciterSelect');
-    const toggleTajweedBtn = document.getElementById('toggleTajweedBtn');
-    const toggleDarkBtn = document.getElementById('toggleDarkBtn');
-    const audioSpeed = document.getElementById('audioSpeed');
-
-    const hifzSurahList = document.getElementById('hifzSurahList');
-    const fromAyahInput = document.getElementById('fromAyahInput');
-    const toAyahInput = document.getElementById('toAyahInput');
-    const loadSurahBtn = document.getElementById('loadSurahBtn');
-    const startRecitationBtn = document.getElementById('startRecitationBtn');
-    const stopRecitationBtn = document.getElementById('stopRecitationBtn');
-    const testVersesContainer = document.getElementById('testVersesContainer');
-    const hifzFeedback = document.getElementById('hifzFeedback');
-    const recordingStatus = document.getElementById('recordingStatus');
-    const hifzBackBtn = document.getElementById('hifzBackBtn');
-
-    // State variables
-    let currentSurah = null;
-    let versesData = [];
-    let bookmarks = JSON.parse(localStorage.getItem('quranBookmarks')) || [];
-    let tajweedOn = true;
-    let isNight = false;
-    let reciter = 'ar.alafasy';
-    let audio = null;
-    let highlightedIndex = -1;
-
-    let selectedTestSurah = null;
-    let testVerses = [];
-    let testFromAyah = 1;
-    let testToAyah = 1;
-
-    let recognition = null;
-    let recognizing = false;
-
-    // Show only one screen
-    function showScreen(screen) {
-      [startScreen, menuScreen, surahViewScreen, hifzTestScreen].forEach(s => s.classList.remove('active'));
-      screen.classList.add('active');
-      // Scroll top on show
-      window.scrollTo(0,0);
+  // Language support
+  const texts = {
+    en: {
+      startJourney: 'Begin the Journey',
+      hifzTest: 'Hifz Test',
+      selectSurah: 'Select Surah',
+      loading: 'Loading…',
+      loadError: 'Error loading surah. Please try again.',
+      invalidRange: 'Invalid Ayah range.',
+      recording: 'Recording...',
+      stopped: 'Recording stopped.',
+      correct: '✅ Correct! Well done.',
+      incorrect: '❌ Some mistakes found in your recitation:\n',
+      notSupported: 'Speech recognition not supported in this browser.',
+      selectSurahHifz: 'Select Surah for Hifz Test',
+      fromAyah: 'From Ayah:',
+      toAyah: 'To Ayah:',
+      loadSurah: 'Load Surah',
+      startRecording: 'Start Recording',
+      stopRecording: 'Stop Recording',
+      back: '← Back to Start',
+      toggleTajweed: 'Toggle Tajweed',
+      playSurah: '▶ Play Surah',
+      nightMode: '🌙 Night Mode',
+      surahViewTitle: 'Surah View',
+      hifzTitle: 'Hifz Test',
+      recordingError: 'Error during recording.',
+      pleaseLoadSurah: 'Please load a surah first.'
+    },
+    ar: {
+      startJourney: 'ابدأ الرحلة',
+      hifzTest: 'اختبار الحفظ',
+      selectSurah: 'اختر السورة',
+      loading: 'جاري التحميل…',
+      loadError: 'حدث خطأ أثناء تحميل السورة. حاول مرة أخرى.',
+      invalidRange: 'نطاق الآيات غير صالح.',
+      recording: 'يتم التسجيل...',
+      stopped: 'تم إيقاف التسجيل.',
+      correct: '✅ صحيح! أحسنت.',
+      incorrect: '❌ بعض الأخطاء في تلاوتك:\n',
+      notSupported: 'التعرف على الكلام غير مدعوم في هذا المتصفح.',
+      selectSurahHifz: 'اختر السورة لاختبار الحفظ',
+      fromAyah: 'من الآية:',
+      toAyah: 'إلى الآية:',
+      loadSurah: 'تحميل السورة',
+      startRecording: 'ابدأ التسجيل',
+      stopRecording: 'أوقف التسجيل',
+      back: '← العودة إلى البداية',
+      toggleTajweed: 'تبديل التجويد',
+      playSurah: '▶ تشغيل السورة',
+      nightMode: '🌙 الوضع الليلي',
+      surahViewTitle: 'عرض السورة',
+      hifzTitle: 'اختبار الحفظ',
+      recordingError: 'حدث خطأ أثناء التسجيل.',
+      pleaseLoadSurah: 'يرجى تحميل سورة أولاً.'
     }
+  };
+  let currentLang = 'en';
 
-    // Tajweed coloring function (basic, you can expand rules here)
-    function applyTajweed(text) {
-      if (!tajweedOn) return text;
-      // Basic example: color madd letters (آ, أ, etc)
-      return text
-        .replace(/(آ|أ|إ|آ)/g, '<span class="madd">$1</span>')
-        .replace(/(نّ|مّ)/g, '<span class="ghunnah">$1</span>')
-        .replace(/(لّ)/g, '<span class="idgham">$1</span>')
-        .replace(/(ق|ط|ب|ج|د)/g, '<span class="qalqalah">$1</span>');
+  // DOM elements
+  const startScreen = document.getElementById('start');
+  const menuScreen = document.getElementById('menu');
+  const surahViewScreen = document.getElementById('surahView');
+  const hifzTestScreen = document.getElementById('hifzTest');
+
+  const startJourneyBtn = document.getElementById('startJourneyBtn');
+  const openHifzTestBtn = document.getElementById('openHifzTestBtn');
+  const toggleDarkBtn = document.getElementById('toggleDarkBtn');
+  const menuToggleDarkBtn = document.getElementById('menuToggleDark');
+  const menuBackBtn = document.getElementById('menuBackBtn');
+  const surahBackBtn = document.getElementById('surahBackBtn');
+  const toggleTajweedBtn = document.getElementById('toggleTajweedBtn');
+  const playSurahBtn = document.getElementById('playSurahBtn');
+  const reciterSelect = document.getElementById('reciterSelect');
+  const languageSelect = document.getElementById('languageSelect');
+
+  const surahListDiv = document.getElementById('surahList');
+  const versesDiv = document.getElementById('verses');
+  const surahTitle = document.getElementById('surahTitle');
+
+  const hifzSurahList = document.getElementById('hifzSurahList');
+  const fromAyahInput = document.getElementById('fromAyahInput');
+  const toAyahInput = document.getElementById('toAyahInput');
+  const loadSurahBtn = document.getElementById('loadSurahBtn');
+  const startRecitationBtn = document.getElementById('startRecitationBtn');
+  const stopRecitationBtn = document.getElementById('stopRecitationBtn');
+  const hifzBackBtn = document.getElementById('hifzBackBtn');
+  const recordingStatus = document.getElementById('recordingStatus');
+  const hifzFeedback = document.getElementById('hifzFeedback');
+  const hifzTitle = document.getElementById('hifzTitle');
+
+  let allSurahs = [];
+  let recognition = null;
+  let recognizing = false;
+  let expectedText = '';
+  let hifzSurahVerses = [];
+
+  // Show/hide screens
+  function showScreen(screen) {
+    [startScreen, menuScreen, surahViewScreen, hifzTestScreen].forEach(s => s.classList.remove('active'));
+    screen.classList.add('active');
+  }
+
+  // Toggle Dark mode
+  function toggleDarkMode() {
+    isDarkMode = !isDarkMode;
+    if(isDarkMode) {
+      document.body.style.background = '#0d1b0f';
+      document.body.style.color = 'var(--text-light)';
+    } else {
+      document.body.style.background = 'var(--background-light)';
+      document.body.style.color = 'var(--text-dark)';
     }
+  }
 
-    // Load surah list from API and populate menus
-    async function loadSurahList() {
-      try {
-        const res = await fetch('https://api.alquran.cloud/v1/surah');
-        const data = await res.json();
-        if (data.code !== 200) throw new Error('API error');
+  // Update UI language texts
+  function updateLanguageUI() {
+    startJourneyBtn.textContent = texts[currentLang].startJourney;
+    openHifzTestBtn.textContent = texts[currentLang].hifzTest;
+    toggleDarkBtn.textContent = texts[currentLang].nightMode;
+    menuToggleDarkBtn.textContent = texts[currentLang].nightMode;
+    menuBackBtn.textContent = texts[currentLang].back;
+    surahBackBtn.textContent = texts[currentLang].back;
+    toggleTajweedBtn.textContent = tajweedEnabled ? (currentLang==='ar'? 'إيقاف التجويد' : 'Disable Tajweed') : texts[currentLang].toggleTajweed;
+    playSurahBtn.textContent = texts[currentLang].playSurah;
+    loadSurahBtn.textContent = texts[currentLang].loadSurah;
+    startRecitationBtn.textContent = texts[currentLang].startRecording;
+    stopRecitationBtn.textContent = texts[currentLang].stopRecording;
+    hifzBackBtn.textContent = texts[currentLang].back;
+    hifzTitle.textContent = texts[currentLang].hifzTitle;
 
-        // Clear lists
-        surahList.innerHTML = '';
-        hifzSurahList.innerHTML = '';
+    document.getElementById('fromAyahLabel').textContent = texts[currentLang].fromAyah;
+    document.getElementById('toAyahLabel').textContent = texts[currentLang].toAyah;
+  }
 
-        data.data.forEach(s => {
-          // Main Surah list (for start journey)
-          const div = document.createElement('div');
-          div.className = 'surahItem';
-          div.tabIndex = 0;
-          div.setAttribute('role', 'listitem');
-          div.setAttribute('aria-label', `Surah ${s.number}: ${s.englishName}, ${s.numberOfAyahs} verses`);
-          div.innerHTML = `
-            <div class="surahName">${s.number}. ${languageSelect.value === 'ar' ? s.name : s.englishName}</div>
-            <div class="surahInfo">${s.numberOfAyahs} verses</div>
-          `;
-          div.addEventListener('click', () => openSurah(s.number));
-          div.addEventListener('keydown', e => { if(e.key==='Enter') openSurah(s.number); });
-          surahList.appendChild(div);
-
-          // For Hifz test surah list
-          const testDiv = document.createElement('div');
-          testDiv.className = 'hifzSurahItem';
-          testDiv.tabIndex = 0;
-          testDiv.setAttribute('role', 'option');
-          testDiv.setAttribute('aria-selected', 'false');
-          testDiv.textContent = `${s.number}. ${languageSelect.value === 'ar' ? s.name : s.englishName}`;
-          testDiv.dataset.surahNumber = s.number;
-          testDiv.addEventListener('click', () => selectTestSurah(s.number, testDiv));
-          testDiv.addEventListener('keydown', e => {
-            if (e.key === 'Enter') selectTestSurah(s.number, testDiv);
-          });
-          hifzSurahList.appendChild(testDiv);
-        });
-      } catch (e) {
-        alert('Failed to load Surah list. Check your internet connection.');
-      }
+  // Load list of all surahs from API
+  async function loadAllSurahs() {
+    try {
+      const res = await fetch('https://api.alquran.cloud/v1/surah');
+      const data = await res.json();
+      if(data.code !== 200) throw new Error('API error');
+      allSurahs = data.data;
+      renderSurahList();
+      renderHifzSurahList();
+    } catch {
+      alert(texts[currentLang].loadError);
     }
+  }
 
-    // Select surah for hifz test
-    function selectTestSurah(surahNumber, elem) {
-      [...hifzSurahList.children].forEach(c => {
-        c.classList.remove('selected');
-        c.setAttribute('aria-selected', 'false');
-      });
-      elem.classList.add('selected');
-      elem.setAttribute('aria-selected', 'true');
-      selectedTestSurah = surahNumber;
-      fromAyahInput.value = 1;
-      toAyahInput.value = 1;
-      hifzFeedback.textContent = '';
-      recordingStatus.textContent = '';
-      testVersesContainer.innerHTML = '';
-      startRecitationBtn.disabled = true;
-    }
+  // Render Surah list for menu
+  function renderSurahList() {
+    surahListDiv.innerHTML = '';
+    allSurahs.forEach(surah => {
+      const div = document.createElement('div');
+      div.className = 'surahItem';
+      div.textContent = currentLang === 'ar'
+        ? `${surah.number}. ${surah.name}`
+        : `${surah.number}. ${surah.englishName}`;
+      div.tabIndex = 0;
+      div.setAttribute('role','button');
+      div.onclick = () => openSurahView(surah.number, surah.englishName, surah.name);
+      div.onkeydown = (e) => { if(e.key === 'Enter') div.click(); };
+      surahListDiv.appendChild(div);
+    });
+  }
 
-    // Open surah from menu, show verses with numbering after Bismillah, apply tajweed
-    async function openSurah(number) {
-      showScreen(surahViewScreen);
-      surahTitle.textContent = 'Loading...';
-      versesDiv.innerHTML = '';
-      currentSurah = number;
-      highlightedIndex = -1;
-
-      try {
-        // Fetch Arabic text with audio metadata
-        const [resArabic, resInfo] = await Promise.all([
-          fetch(`https://api.alquran.cloud/v1/surah/${number}/ar.alafasy`),
-          fetch(`https://api.alquran.cloud/v1/surah/${number}`)
-        ]);
-        const dataArabic = await resArabic.json();
-        const dataInfo = await resInfo.json();
-
-        if(dataArabic.code !== 200 || dataInfo.code !== 200) throw new Error('API error');
-
-        const ayahs = dataArabic.data.ayahs;
-        versesData = ayahs; // Save for audio sync
-        surahTitle.textContent = languageSelect.value === 'ar' ? `${dataInfo.data.name}` : `${dataInfo.data.englishName}`;
-
-        versesDiv.innerHTML = '';
-
-        // Show Bismillah for all except Surah 1 (Al-Fatiha)
-        let startIndex = 0;
-        if(number !== 1) {
-          const bismillahDiv = document.createElement('div');
-          bismillahDiv.className = 'bismillah';
-          bismillahDiv.innerHTML = applyTajweed('بسم الله الرحمن الرحيم');
-          versesDiv.appendChild(bismillahDiv);
-          startIndex = 1; // skip first ayah numbering as it is Bismillah
-        }
-
-        // Display ayahs numbered starting from 1 after Bismillah
-        for(let i = startIndex; i < ayahs.length; i++) {
-          const ayah = ayahs[i];
-          const verseDiv = document.createElement('div');
-          verseDiv.className = 'verse';
-          verseDiv.dataset.index = i - startIndex;
-
-          const numSpan = document.createElement('span');
-          numSpan.className = 'verse-number';
-          numSpan.textContent = (i - startIndex + 1) + '.';
-
-          const arabicSpan = document.createElement('span');
-          arabicSpan.className = 'arabic';
-          arabicSpan.innerHTML = applyTajweed(ayah.text);
-
-          verseDiv.appendChild(numSpan);
-          verseDiv.appendChild(arabicSpan);
-
-          versesDiv.appendChild(verseDiv);
-        }
-
-        setupAudio();
-      } catch(e) {
-        alert('Error loading Surah content.');
-        showScreen(menuScreen);
-      }
-    }
-
-    // Setup audio and attach event listeners for highlighting ayahs
-    function setupAudio() {
-      if(audio) {
-        audio.pause();
-        audio = null;
-      }
-      if(!currentSurah) return;
-
-      let surahNum = currentSurah.toString().padStart(3, '0');
-      const recitersBase = {
-        'ar.alafasy': 'https://verses.quran.com/ar.alafasy/128/',
-        'ar.abdulbasitmurattal': 'https://verses.quran.com/ar.abdulbasitmurattal/128/',
-        'ar.husary': 'https://verses.quran.com/ar.husary_mujawwad/128/',
-        'ar.minshawi': 'https://verses.quran.com/ar.minshawi/128/',
-        'ar.shaatree': 'https://verses.quran.com/ar.shaatree/128/',
-        'ar.sudais': 'https://verses.quran.com/ar.sudais/128/',
-        'ar.ajamy': 'https://verses.quran.com/ar.ajamy/128/'
+  // Render Surah list for Hifz test
+  function renderHifzSurahList() {
+    hifzSurahList.innerHTML = '';
+    allSurahs.forEach(surah => {
+      const div = document.createElement('div');
+      div.className = 'hifzSurahItem';
+      div.textContent = currentLang === 'ar'
+        ? `${surah.number}. ${surah.name}`
+        : `${surah.number}. ${surah.englishName}`;
+      div.tabIndex = 0;
+      div.setAttribute('role','option');
+      div.onclick = () => {
+        [...hifzSurahList.children].forEach(c => c.classList.remove('selected'));
+        div.classList.add('selected');
+        currentSurahId = surah.number;
+        currentSurahName = surah.englishName;
+        currentSurahArabicName = surah.name;
+        fromAyahInput.value = 1;
+        toAyahInput.value = 1;
+        fromAyahInput.min = 1;
+        toAyahInput.min = 1;
+        loadSurahVersesForHifz(surah.number);
       };
-      const baseURL = recitersBase[reciter] || recitersBase['ar.alafasy'];
+      div.onkeydown = (e) => { if(e.key === 'Enter') div.click(); };
+      hifzSurahList.appendChild(div);
+    });
+  }
 
-      // Create audio element
-      audio = new Audio();
-      audio.preload = "auto";
+  // Open surah view for reading and listening
+  async function openSurahView(num, en, ar) {
+    showScreen(surahViewScreen);
+    currentSurahId = num;
+    currentSurahName = en;
+    currentSurahArabicName = ar;
+    surahTitle.textContent = currentLang === 'ar' ? `${num}. ${ar}` : `${num}. ${en}`;
+    versesDiv.innerHTML = texts[currentLang].loading;
+    try {
+      const [arRes, enRes] = await Promise.all([
+        fetch(`https://api.alquran.cloud/v1/surah/${num}`),
+        fetch(`https://api.alquran.cloud/v1/surah/${num}/en.asad`)
+      ]);
+      const arData = await arRes.json();
+      const enData = await enRes.json();
+      if(arData.code !== 200 || enData.code !== 200) throw new Error('API error');
+      const ayahs = arData.data.ayahs;
+      const translations = enData.data.ayahs;
 
-      // We'll stream each ayah's mp3 sequentially and highlight accordingly
-      let currentPlayingIndex = 0;
-      let ayahAudios = [];
+      versesData = ayahs.map((ayah, idx) => ({
+        number: ayah.numberInSurah,
+        arabic: ayah.text,
+        translation: translations[idx].text
+      }));
 
-      // Compose array of audio URLs per ayah
-      for(let i=0; i < versesData.length; i++) {
-        // Example URL: base + surahNum + ayahNum + .mp3
-        // But the API might not provide mp3 URLs exactly; this is a placeholder scheme.
-        // So instead, for demo, we'll just play full Surah audio for simplicity:
-        // We'll use one full Surah audio instead.
-      }
+      renderVerses();
+    } catch {
+      versesDiv.innerHTML = `<p style="color:red;">${texts[currentLang].loadError}</p>`;
+    }
+  }
 
-      // For simplicity: play full surah mp3 from Quranicaudio
-      // Source links (you can customize or host your own audio files)
-      audio.src = `https://cdn.islamic.network/quran/audio-surah/${reciter}/${currentSurah}.mp3`;
-      audio.playbackRate = parseFloat(audioSpeed.value);
+  // Render verses with Tajweed and numbering (excluding Bismillah)
+  function renderVerses() {
+    versesDiv.innerHTML = '';
+    let startNumberingIndex = 0;
 
-      // Highlighting logic based on time update (this needs timing info per ayah)
-      // Because we lack detailed timestamps, we will fake highlighting by dividing duration evenly by ayah count
-      audio.addEventListener('play', () => {
-        highlightedIndex = -1;
-        versesDiv.querySelectorAll('.verse').forEach(v => v.classList.remove('highlighted'));
-      });
-
-      audio.addEventListener('timeupdate', () => {
-        if (!audio.duration || versesData.length === 0) return;
-
-        let duration = audio.duration;
-        let currentTime = audio.currentTime;
-
-        // Calculate which ayah should be highlighted based on time
-        let approxIndex = Math.floor((currentTime / duration) * versesData.length);
-
-        // Adjust for Bismillah offset (since numbering starts after it)
-        if (currentSurah !== 1) approxIndex = approxIndex - 1;
-
-        if (approxIndex !== highlightedIndex && approxIndex >= 0 && approxIndex < versesDiv.children.length) {
-          // Remove previous highlight
-          if (highlightedIndex >= 0) {
-            versesDiv.children[highlightedIndex].classList.remove('highlighted');
-          }
-          // Add new highlight
-          versesDiv.children[approxIndex].classList.add('highlighted');
-          highlightedIndex = approxIndex;
-
-          // Scroll verse into view nicely
-          versesDiv.children[approxIndex].scrollIntoView({behavior: 'smooth', block: 'center'});
-        }
-      });
-
-      audio.addEventListener('ended', () => {
-        if (highlightedIndex >= 0) {
-          versesDiv.children[highlightedIndex].classList.remove('highlighted');
-        }
-        highlightedIndex = -1;
-      });
+    // Detect and separate Bismillah ar-Rahman ar-Raheem if first verse contains it
+    if(versesData.length > 0 && versesData[0].arabic.includes('بسم الله الرحمن الرحيم')) {
+      // Show Bismillah separately, no number
+      const bismillahDiv = document.createElement('div');
+      bismillahDiv.className = 'bismillah';
+      bismillahDiv.innerHTML = tajweedEnabled ? applyTajweed(versesData[0].arabic) : versesData[0].arabic;
+      versesDiv.appendChild(bismillahDiv);
+      startNumberingIndex = 1; // Start numbering from second verse
     }
 
-    // Play/Pause surah audio
-    playSurahBtn.addEventListener('click', () => {
-      if (!audio) return;
-      if (audio.paused) {
-        audio.play();
-        playSurahBtn.textContent = '⏸ Pause';
-        playSurahBtn.setAttribute('aria-label', 'Pause Surah Audio');
-      } else {
-        audio.pause();
-        playSurahBtn.textContent = '▶ Play';
-        playSurahBtn.setAttribute('aria-label', 'Play Surah Audio');
-      }
-    });
-
-    // Bookmark current surah
-    bookmarkBtn.addEventListener('click', () => {
-      if (!currentSurah) return;
-      if (bookmarks.includes(currentSurah)) return alert('Already bookmarked.');
-      bookmarks.push(currentSurah);
-      localStorage.setItem('quranBookmarks', JSON.stringify(bookmarks));
-      renderBookmarks();
-      alert('Bookmarked!');
-    });
-
-    // Render bookmarks list
-    async function renderBookmarks() {
-      bookmarksList.innerHTML = '';
-      if(bookmarks.length === 0) {
-        bookmarksList.innerHTML = '<p>No bookmarks yet.</p>';
-        return;
-      }
-      try {
-        const res = await fetch('https://api.alquran.cloud/v1/surah');
-        const data = await res.json();
-        if(data.code !== 200) return;
-        const allSurahs = data.data;
-
-        bookmarks.forEach(bm => {
-          const surah = allSurahs.find(s => s.number === bm);
-          if(!surah) return;
-          const div = document.createElement('div');
-          div.className = 'bookmark-item';
-          div.tabIndex = 0;
-          div.setAttribute('role', 'listitem');
-          div.setAttribute('aria-label', `Bookmark Surah ${bm}: ${surah.englishName}`);
-          div.innerHTML = `
-            <span>${bm}. ${languageSelect.value === 'ar' ? surah.name : surah.englishName}</span>
-            <button aria-label="Remove Bookmark for Surah ${bm}">&times;</button>
-          `;
-          div.querySelector('button').addEventListener('click', e => {
-            e.stopPropagation();
-            bookmarks = bookmarks.filter(x => x !== bm);
-            localStorage.setItem('quranBookmarks', JSON.stringify(bookmarks));
-            renderBookmarks();
-          });
-          div.addEventListener('click', () => {
-            openSurah(bm);
-            showScreen(surahViewScreen);
-          });
-          bookmarksList.appendChild(div);
-        });
-      } catch {
-        bookmarksList.innerHTML = '<p>Error loading bookmarks.</p>';
-      }
-    }
-
-    // Back buttons
-    surahBackBtn.addEventListener('click', () => {
-      if(audio) {
-        audio.pause();
-        playSurahBtn.textContent = '▶ Play';
-      }
-      showScreen(menuScreen);
-    });
-    hifzBackBtn.addEventListener('click', () => {
-      if(recognition && recognizing) {
-        recognition.stop();
-      }
-      showScreen(startScreen);
-      resetHifzTest();
-    });
-
-    // Toggle Tajweed coloring
-    toggleTajweedBtn.addEventListener('click', () => {
-      tajweedOn = !tajweedOn;
-      toggleTajweedBtn.setAttribute('aria-pressed', tajweedOn.toString());
-      toggleTajweedBtn.textContent = tajweedOn ? 'Tajweed On' : 'Tajweed Off';
-      // Refresh verses if opened
-      if(currentSurah) openSurah(currentSurah);
-    });
-
-    // Toggle Night mode
-    toggleDarkBtn.addEventListener('click', () => {
-      isNight = !isNight;
-      toggleDarkBtn.setAttribute('aria-pressed', isNight.toString());
-      toggleDarkBtn.textContent = isNight ? 'Light Mode' : 'Night Mode';
-      document.body.classList.toggle('night', isNight);
-    });
-
-    // Change reciter
-    reciterSelect.addEventListener('change', (e) => {
-      reciter = e.target.value;
-      if(currentSurah) openSurah(currentSurah);
-    });
-
-    // Change language (reload surah list, menu title, bookmarks text)
-    languageSelect.addEventListener('change', () => {
-      menuTitle.textContent = languageSelect.value === 'ar' ? 'مستكشف القرآن' : 'Quran Explorer';
-      loadSurahList();
-      renderBookmarks();
-    });
-
-    // Change audio speed
-    audioSpeed.addEventListener('input', () => {
-      if(audio) audio.playbackRate = parseFloat(audioSpeed.value);
-    });
-
-    // --- Hifz Test ---
-
-    // Load surah verses for hifz test
-    loadSurahBtn.addEventListener('click', async () => {
-      if (!selectedTestSurah) return alert('Please select a surah first.');
-      testFromAyah = parseInt(fromAyahInput.value, 10);
-      testToAyah = parseInt(toAyahInput.value, 10);
-
-      if (isNaN(testFromAyah) || isNaN(testToAyah) || testFromAyah < 1 || testToAyah < testFromAyah) {
-        alert('Please enter valid From and To ayah numbers.');
-        return;
-      }
-      try {
-        testVersesContainer.innerHTML = 'Loading verses...';
-        const res = await fetch(`https://api.alquran.cloud/v1/surah/${selectedTestSurah}/ar`);
-        const data = await res.json();
-        if (data.code !== 200) throw new Error('API error');
-
-        const ayahs = data.data.ayahs;
-        const totalAyahs = ayahs.length;
-
-        if (testToAyah > totalAyahs) {
-          alert(`This Surah has only ${totalAyahs} ayahs.`);
-          return;
-        }
-
-        testVerses = ayahs.slice(testFromAyah - 1, testToAyah);
-        testVersesContainer.innerHTML = '';
-        testVerses.forEach((v, idx) => {
-          const div = document.createElement('div');
-          div.className = 'verse';
-          div.innerHTML = `<span class="verse-number">${testFromAyah + idx}.</span> <span class="arabic">${v.text}</span>`;
-          testVersesContainer.appendChild(div);
-        });
-        startRecitationBtn.disabled = false;
-        hifzFeedback.textContent = '';
-        recordingStatus.textContent = '';
-      } catch (e) {
-        alert('Failed to load Surah verses for Hifz test.');
-      }
-    });
-
-    // Reset Hifz Test UI
-    function resetHifzTest() {
-      selectedTestSurah = null;
-      fromAyahInput.value = 1;
-      toAyahInput.value = 1;
-      testVersesContainer.innerHTML = '';
-      hifzFeedback.textContent = '';
-      recordingStatus.textContent = '';
-      startRecitationBtn.disabled = true;
-      stopRecitationBtn.style.display = 'none';
-      startRecitationBtn.style.display = 'inline-block';
-      [...hifzSurahList.children].forEach(c => {
-        c.classList.remove('selected');
-        c.setAttribute('aria-selected', 'false');
-      });
-    }
-
-    // Speech Recognition setup (Google Chrome only)
-    function setupSpeechRecognition() {
-      if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        alert('Speech Recognition API not supported in this browser. Please use Chrome.');
-        startRecitationBtn.disabled = true;
-        return null;
-      }
-
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const rec = new SpeechRecognition();
-
-      rec.lang = 'ar-SA';
-      rec.interimResults = false;
-      rec.maxAlternatives = 1;
-
-      rec.continuous = false;
-
-      return rec;
-    }
-
-    recognition = setupSpeechRecognition();
-
-    // Start recording
-    startRecitationBtn.addEventListener('click', () => {
-      if(!recognition) return;
-      hifzFeedback.textContent = '';
-      recordingStatus.textContent = 'Recording... Please recite now.';
-      startRecitationBtn.disabled = true;
-      stopRecitationBtn.style.display = 'inline-block';
-      startRecitationBtn.style.display = 'none';
-
-      recognition.start();
-      recognizing = true;
-    });
-
-    // Stop recording button
-    stopRecitationBtn.addEventListener('click', () => {
-      if(recognition && recognizing) {
-        recognition.stop();
-        recordingStatus.textContent = 'Stopping...';
-      }
-    });
-
-    recognition.onresult = event => {
-      recognizing = false;
-      recordingStatus.textContent = 'Recording stopped.';
-      stopRecitationBtn.style.display = 'none';
-      startRecitationBtn.style.display = 'inline-block';
-      startRecitationBtn.disabled = false;
-
-      if(event.results.length === 0) {
-        hifzFeedback.textContent = 'No audio detected, please try again.';
-        return;
-      }
-
-      const transcript = event.results[0][0].transcript.replace(/\s+/g, '').trim();
-      // Build expected text string for comparison
-      const expectedText = testVerses.map(v => v.text.replace(/\s+/g, '').trim()).join('');
-
-      // Simple character-based diffing to show mistakes
-      let correctCount = 0;
-      let totalChars = expectedText.length;
-
-      let minLen = Math.min(transcript.length, expectedText.length);
-
-      for(let i=0; i<minLen; i++) {
-        if(transcript[i] === expectedText[i]) correctCount++;
-      }
-
-      let accuracy = ((correctCount / totalChars) * 100).toFixed(1);
-
-      hifzFeedback.innerHTML = `
-        <strong>Accuracy:</strong> ${accuracy}%<br/>
-        <strong>Your Recitation:</strong> ${transcript.substring(0, 200)}${transcript.length > 200 ? '...' : ''}
+    for(let i = startNumberingIndex; i < versesData.length; i++) {
+      const v = versesData[i];
+      const verseDiv = document.createElement('div');
+      verseDiv.className = 'verse';
+      verseDiv.innerHTML = `
+        <div class="verse-number">${v.number}</div>
+        <div class="arabic">${tajweedEnabled ? applyTajweed(v.arabic) : v.arabic}</div>
+        <div class="translation">${v.translation}</div>
       `;
+      versesDiv.appendChild(verseDiv);
+    }
+  }
 
-      if(accuracy < 90) {
-        hifzFeedback.innerHTML += '<br/><em>Please focus on pronunciation and try again.</em>';
-      } else {
-        hifzFeedback.innerHTML += '<br/><em>MashaAllah! Great job.</em>';
-      }
+  // Simple Tajweed coloring function for demonstration
+  function applyTajweed(text) {
+    return text
+      .replace(/(م{2,})/g, '<span class="ghunnah">$1</span>') // ghunnah example (meem)
+      .replace(/(ن{2,})/g, '<span class="idgham">$1</span>')  // idgham example (noon)
+      .replace(/(ـٓ)/g, '<span class="madd">ـٓ</span>');     // madd symbol
+  }
+
+  // Play Surah audio
+  function playSurahAudio() {
+    if(audioPlayer) {
+      audioPlayer.pause();
+      audioPlayer = null;
+    }
+    audioPlayer = new Audio(`https://cdn.islamic.network/quran/audio-surah/128/${reciter}/${currentSurahId}.mp3`);
+    audioPlayer.play();
+  }
+
+  // Speech recognition setup for Hifz test
+  function setupRecognition() {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      alert(texts[currentLang].notSupported);
+      return null;
+    }
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.lang = currentLang === 'ar' ? 'ar-SA' : 'en-US';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      recognizing = true;
+      recordingStatus.textContent = texts[currentLang].recording;
+      hifzFeedback.textContent = '';
     };
 
-    recognition.onerror = event => {
+    recognition.onerror = (event) => {
       recognizing = false;
-      hifzFeedback.textContent = 'Error occurred during recognition: ' + event.error;
       recordingStatus.textContent = '';
-      stopRecitationBtn.style.display = 'none';
-      startRecitationBtn.style.display = 'inline-block';
+      hifzFeedback.textContent = texts[currentLang].recordingError + ` (${event.error})`;
       startRecitationBtn.disabled = false;
+      stopRecitationBtn.style.display = 'none';
     };
 
     recognition.onend = () => {
       recognizing = false;
-      recordingStatus.textContent = '';
-      stopRecitationBtn.style.display = 'none';
-      startRecitationBtn.style.display = 'inline-block';
+      recordingStatus.textContent = texts[currentLang].stopped;
       startRecitationBtn.disabled = false;
+      stopRecitationBtn.style.display = 'none';
     };
 
-    // Buttons to open screens
-    startJourneyBtn.addEventListener('click', () => {
-      loadSurahList();
-      renderBookmarks();
-      showScreen(menuScreen);
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      analyzeRecitation(transcript);
+    };
+  }
+
+  // Normalize Arabic text for comparison
+  function normalizeArabic(text) {
+    return text
+      .replace(/[\u064B-\u065F]/g, '') // remove tashkeel
+      .replace(/\s+/g, '') // remove spaces
+      .replace(/ـ/g, '') // remove tatweel
+      .trim();
+  }
+
+  // Compare expected and recognized text, highlight mistakes
+  function compareTexts(expected, actual) {
+    const expectedWords = expected.split(/\s+/);
+    const actualWords = actual.split(/\s+/);
+
+    let mistakes = [];
+
+    expectedWords.forEach((word, idx) => {
+      if (!actualWords[idx] || normalizeArabic(word) !== normalizeArabic(actualWords[idx])) {
+        mistakes.push(word);
+      }
     });
 
-    openHifzTestBtn.addEventListener('click', () => {
-      resetHifzTest();
-      loadSurahList();
-      showScreen(hifzTestScreen);
-    });
+    return mistakes;
+  }
 
-    // Initial load
-    loadSurahList();
+  // Analyze recitation and show feedback
+  function analyzeRecitation(userText) {
+    if(!expectedText) return;
 
-  </script>
+    const normExpected = normalizeArabic(expectedText);
+    const normUser = normalizeArabic(userText);
+
+    if(normExpected === normUser) {
+      hifzFeedback.style.color = 'green';
+      hifzFeedback.textContent = texts[currentLang].correct;
+    } else {
+      hifzFeedback.style.color = '#b22';
+      const mistakes = compareTexts(expectedText, userText);
+      hifzFeedback.textContent = texts[currentLang].incorrect + mistakes.join(' ');
+    }
+  }
+
+  // Load surah verses for Hifz test and set max ayah range
+  async function loadSurahVersesForHifz(surahNumber) {
+    hifzFeedback.textContent = '';
+    recordingStatus.textContent = '';
+    fromAyahInput.value = 1;
+    toAyahInput.value = 1;
+
+    try {
+      const res = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}`);
+      const data = await res.json();
+      if(data.code !== 200) throw new Error('API error');
+      hifzSurahVerses = data.data.ayahs;
+      const maxAyah = hifzSurahVerses.length;
+      fromAyahInput.max = maxAyah;
+      toAyahInput.max = maxAyah;
+      toAyahInput.value = maxAyah;
+    } catch {
+      alert(texts[currentLang].loadError);
+    }
+  }
+
+  // Load selected ayah range for Hifz test
+  function loadSelectedVerses() {
+    hifzFeedback.textContent = '';
+    recordingStatus.textContent = '';
+    startRecitationBtn.disabled = true;
+
+    if (!currentSurahId) {
+      alert(texts[currentLang].pleaseLoadSurah);
+      return;
+    }
+    const from = parseInt(fromAyahInput.value, 10);
+    const to = parseInt(toAyahInput.value, 10);
+
+    if (from < 1 || to > hifzSurahVerses.length || from > to) {
+      alert(texts[currentLang].invalidRange);
+      return;
+    }
+
+    expectedText = hifzSurahVerses.slice(from - 1, to).map(v => v.text).join(' ');
+    hifzFeedback.style.color = 'var(--primary-green)';
+    hifzFeedback.textContent = `Recite from Ayah ${from} to ${to}`;
+    startRecitationBtn.disabled = false;
+  }
+
+  // Start recording for Hifz test
+  function startRecording() {
+    if (!recognition) {
+      setupRecognition();
+      if (!recognition) return;
+    }
+    recognition.start();
+    startRecitationBtn.disabled = true;
+    stopRecitationBtn.style.display = 'inline-block';
+  }
+
+  // Stop recording
+  function stopRecording() {
+    if (recognition && recognizing) {
+      recognition.stop();
+    }
+  }
+
+  // Event listeners
+  startJourneyBtn.onclick = () => {
+    showScreen(menuScreen);
+  };
+
+  openHifzTestBtn.onclick = () => {
+    showScreen(hifzTestScreen);
+  };
+
+  toggleDarkBtn.onclick = () => toggleDarkMode();
+  menuToggleDarkBtn.onclick = () => toggleDarkMode();
+
+  menuBackBtn.onclick = () => {
+    showScreen(startScreen);
+  };
+
+  surahBackBtn.onclick = () => {
+    if(audioPlayer) {
+      audioPlayer.pause();
+      audioPlayer = null;
+    }
+    showScreen(menuScreen);
+  };
+
+  toggleTajweedBtn.onclick = () => {
+    tajweedEnabled = !tajweedEnabled;
+    toggleTajweedBtn.textContent = tajweedEnabled ? (currentLang === 'ar' ? 'إيقاف التجويد' : 'Disable Tajweed') : texts[currentLang].toggleTajweed;
+    renderVerses();
+  };
+
+  playSurahBtn.onclick = () => {
+    if(!currentSurahId) return;
+    playSurahAudio();
+  };
+
+  reciterSelect.onchange = () => {
+    reciter = reciterSelect.value;
+  };
+
+  languageSelect.onchange = () => {
+    currentLang = languageSelect.value;
+    updateLanguageUI();
+    renderSurahList();
+    renderHifzSurahList();
+    if(currentSurahId) {
+      openSurahView(currentSurahId, currentSurahName, currentSurahArabicName);
+    }
+  };
+
+  loadSurahBtn.onclick = loadSelectedVerses;
+  startRecitationBtn.onclick = startRecording;
+  stopRecitationBtn.onclick = stopRecording;
+  hifzBackBtn.onclick = () => showScreen(startScreen);
+
+  // Initialize app
+  window.onload = () => {
+    updateLanguageUI();
+    loadAllSurahs();
+    showScreen(startScreen);
+    setupRecognition();
+  };
+</script>
+
 </body>
 </html>
 
